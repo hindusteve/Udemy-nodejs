@@ -13,7 +13,17 @@ const server = http.createServer((req, res) =>
         return res.end();
     }
     if (url==='/message' && method==='POST') {
-        fs.writeFileSync('message.txt', 'DUMMUY');
+        const body = [];
+        req.on('data', (chunk) => {
+            console.log(chunk);  // only for illustrative purposes, to see what the chunk looks like
+            body.push(chunk);
+        });
+        req.on('end', () => {
+            const parsedBody=Buffer.concat(body).toString();
+            console.log(parsedBody);   // only for illustrative purposes, to see what body converted to string and Buffer object looks liike
+            const message = parsedBody.split('=')[1];
+            fs.writeFileSync('message.txt', message);
+        })
         res.statusCode=302;
         res.setHeader('Location', '/');
         return res.end();
